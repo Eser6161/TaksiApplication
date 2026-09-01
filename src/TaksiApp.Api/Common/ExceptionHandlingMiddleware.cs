@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text.Json;
+using TaksiApp.Domain.Exceptions;
 
 namespace TaksiApp.Api.Common;
 
@@ -31,6 +32,7 @@ public class ExceptionHandlingMiddleware
 
             var (statusCode, code, message) = ex switch
             {
+                DomainException => (HttpStatusCode.BadRequest, "DOMAIN_ERROR", ex.Message),
                 KeyNotFoundException => (HttpStatusCode.NotFound, "NOT_FOUND", ex.Message),
                 UnauthorizedAccessException => (HttpStatusCode.Unauthorized, "UNAUTHORIZED", ex.Message),
                 ArgumentException => (HttpStatusCode.BadRequest, "BAD_REQUEST", ex.Message),
