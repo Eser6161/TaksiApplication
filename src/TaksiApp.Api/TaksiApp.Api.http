@@ -1,0 +1,6 @@
+@TaksiApp.Api_HostAddress = http://localhost:5183
+
+GET {{TaksiApp.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
