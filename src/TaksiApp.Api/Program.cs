@@ -1,24 +1,15 @@
-using TaksiApp.Api.Middleware;
+using TaksiApp.Api.Extensions;
 using TaksiApp.Application;
 using TaksiApp.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
-builder.Services.AddOpenApi();
+builder.Services.AddApiServices();
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
-
-app.UseMiddleware<ExceptionHandlingMiddleware>();
-app.UseHttpsRedirection();
-app.UseAuthorization();
-app.MapControllers();
+app.UseApiEndpoints();
 
 app.Run();
