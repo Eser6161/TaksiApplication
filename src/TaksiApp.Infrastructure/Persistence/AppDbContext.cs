@@ -10,6 +10,9 @@ public class AppDbContext : DbContext
     }
 
     public DbSet<User> Users => Set<User>();
+    public DbSet<TaksiApp.Domain.Entities.Address> Addresses => Set<TaksiApp.Domain.Entities.Address>();
+    public DbSet<TaksiApp.Domain.Entities.OtpRequest> OtpRequests => Set<TaksiApp.Domain.Entities.OtpRequest>();
+    public DbSet<TaksiApp.Domain.Entities.RefreshToken> RefreshTokens => Set<TaksiApp.Domain.Entities.RefreshToken>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
