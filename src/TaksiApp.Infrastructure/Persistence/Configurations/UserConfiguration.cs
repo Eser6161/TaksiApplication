@@ -21,11 +21,12 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.HasIndex(u => u.Email)
             .IsUnique();
 
-        builder.Property(u => u.PasswordHash)
-            .IsRequired();
-
         builder.Property(u => u.PhoneNumber)
             .HasMaxLength(20);
+
+        builder.HasIndex(u => u.PhoneNumber)
+            .IsUnique()
+            .HasFilter("[PhoneNumber] IS NOT NULL");
 
         builder.Property(u => u.Role)
             .IsRequired()

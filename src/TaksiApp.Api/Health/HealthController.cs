@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace TaksiApp.Api.Controllers;
+namespace TaksiApp.Api.Health;
 
 [ApiController]
 [Route("api/[controller]")]

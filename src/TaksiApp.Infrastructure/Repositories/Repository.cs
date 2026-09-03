@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using TaksiApp.Domain.Entities;
 using TaksiApp.Domain.Interfaces;
@@ -24,6 +25,11 @@ public class Repository<T> : IRepository<T> where T : BaseEntity
     public async Task<IReadOnlyList<T>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         return await DbSet.AsNoTracking().ToListAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<T>> FindAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
+    {
+        return await DbSet.Where(predicate).ToListAsync(cancellationToken);
     }
 
     public async Task AddAsync(T entity, CancellationToken cancellationToken = default)

@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using TaksiApp.Application.Auth;
 using TaksiApp.Domain.Entities;
 
 namespace TaksiApp.Api.Auth;
@@ -12,44 +13,39 @@ public class JwtTokenService : IJwtTokenService
 {
     private readonly JwtSettings _settings;
 
-    public JwtTokenService(IOptions<JwtSettings> options)
+    public JwtTokenService(IOptions<JwtSettings> settings)
     {
-        _settings = options.Value;
+        _settings = settings.Value;
     }
 
     public string GenerateAccessToken(User user)
     {
-        var claims = new List<Claim>
+        var claims = new[]
         {
-            new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new(ClaimTypes.Role, user.Role.ToString().ToLowerInvariant()),
-            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim("phone", user.PhoneNumber ?? ""),
+            new Claim(ClaimTypes.Role, user.Role.ToString())
         };
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.SigningKey));
-        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.SecretKey));
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
             issuer: _settings.Issuer,
             audience: _settings.Audience,
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(_settings.AccessTokenMinutes),
-            signingCredentials: credentials);
+            expires: DateTime.UtcNow.AddMinutes(_settings.AccessTokenExpirationMinutes),
+            signingCredentials: creds);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
     public string GenerateRefreshToken()
     {
-        var randomBytes = RandomNumberGenerator.GetBytes(64);
+        var randomBytes = new byte[64];
+        using var rng = RandomNumberGenerator.Create();
+        rng.GetBytes(randomBytes);
         return Convert.ToBase64String(randomBytes);
-    }
-
-    public string HashToken(string token)
-    {
-        var bytes = Encoding.UTF8.GetBytes(token);
-        var hash = SHA256.HashData(bytes);
-        return Convert.ToBase64String(hash);
     }
 }
