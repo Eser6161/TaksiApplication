@@ -2,7 +2,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TaksiApp.Domain\TaksiApp.Domain.csproj" />
-    <ProjectReference Include="..\TaksiApp.Application\TaksiApp.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>

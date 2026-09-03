@@ -1,7 +1,6 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/TaksiApp.Api/TaksiApp.Api.csproj" />
-    <Project Path="src/TaksiApp.Application/TaksiApp.Application.csproj" />
     <Project Path="src/TaksiApp.Domain/TaksiApp.Domain.csproj" />
     <Project Path="src/TaksiApp.Infrastructure/TaksiApp.Infrastructure.csproj" />
   </Folder>
