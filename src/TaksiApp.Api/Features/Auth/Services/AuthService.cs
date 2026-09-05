@@ -59,6 +59,7 @@ public class AuthService : IAuthService
         var otps = await _otpRepo.FindAsync(o =>
             o.PhoneNumber == phoneNumber &&
             o.Code == otpCode &&
+            o.OtpType == "login" &&
             !o.IsUsed &&
             o.ExpiresAtUtc > DateTime.UtcNow);
 

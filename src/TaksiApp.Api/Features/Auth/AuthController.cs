@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TaksiApp.Api.Common.Models;
 using TaksiApp.Api.Features.Auth.DTOs;
 using TaksiApp.Api.Features.Auth.Infrastructure;
 using TaksiApp.Api.Features.Auth.Services;
@@ -21,18 +22,18 @@ public class AuthController : ControllerBase
 
     // ── OTP-based Authentication ──
 
-    [HttpPost("send-otp")]
+    [HttpPost("sendOtp")]
     public async Task<IActionResult> SendOtp([FromBody] SendOtpRequest request)
     {
         await _authService.SendOtpAsync(request.PhoneNumber);
-        return Ok(new { message = "OTP gönderildi." });
+        return Ok(ApiResponse<object?>.SuccessResponse(null, "OTP gönderildi."));
     }
 
-    [HttpPost("verify-otp")]
+    [HttpPost("verifyOtp")]
     public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpRequest request)
     {
         var result = await _authService.VerifyOtpAsync(request.PhoneNumber, request.OtpCode);
-        return Ok(result);
+        return Ok(ApiResponse<AuthResult>.SuccessResponse(result, result.IsNewUser ? "Yeni kullanıcı oluşturuldu." : "Giriş başarılı."));
     }
 
     // ── Password-based Authentication ──
@@ -42,56 +43,56 @@ public class AuthController : ControllerBase
     {
         var result = await _authService.RegisterWithPasswordAsync(
             request.FullName, request.Email, request.Password, request.PhoneNumber);
-        return StatusCode(201, result);
+        return StatusCode(201, ApiResponse<AuthResult>.SuccessResponse(result, "Kayıt başarılı."));
     }
 
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginWithPasswordRequest request)
     {
         var result = await _authService.LoginWithPasswordAsync(request.Email, request.Password);
-        return Ok(result);
+        return Ok(ApiResponse<AuthResult>.SuccessResponse(result, "Giriş başarılı."));
     }
 
     // ── Password Management ──
 
     [Authorize]
-    [HttpPost("change-password")]
+    [HttpPost("changePassword")]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
     {
         await _authService.ChangePasswordAsync(_currentUser.UserId, request.OldPassword, request.NewPassword);
-        return Ok(new { message = "Şifre başarıyla değiştirildi." });
+        return Ok(ApiResponse<object?>.SuccessResponse(null, "Şifre başarıyla değiştirildi."));
     }
 
-    [HttpPost("forgot-password")]
+    [HttpPost("forgotPassword")]
     public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
     {
         await _authService.ForgotPasswordAsync(request.PhoneNumber);
-        return Ok(new { message = "Şifre sıfırlama OTP'si gönderildi." });
+        return Ok(ApiResponse<object?>.SuccessResponse(null, "Şifre sıfırlama OTP'si gönderildi."));
     }
 
-    [HttpPost("reset-password")]
+    [HttpPost("resetPassword")]
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
     {
         await _authService.ResetPasswordAsync(request.PhoneNumber, request.OtpCode, request.NewPassword);
-        return Ok(new { message = "Şifre başarıyla sıfırlandı." });
+        return Ok(ApiResponse<object?>.SuccessResponse(null, "Şifre başarıyla sıfırlandı."));
     }
 
     // ── Profile Management ──
 
     [Authorize]
-    [HttpPost("complete-profile")]
+    [HttpPost("completeProfile")]
     public async Task<IActionResult> CompleteProfile([FromBody] CompleteProfileRequest request)
     {
         await _authService.CompleteProfileAsync(_currentUser.UserId, request.FullName, request.Email);
-        return Ok(new { message = "Profil tamamlandı." });
+        return Ok(ApiResponse<object?>.SuccessResponse(null, "Profil tamamlandı."));
     }
 
     // ── Token Management ──
 
-    [HttpPost("refresh-token")]
+    [HttpPost("refreshToken")]
     public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
     {
         var result = await _authService.RefreshTokenAsync(request.RefreshToken);
-        return Ok(result);
+        return Ok(ApiResponse<AuthResult>.SuccessResponse(result, "Token yenilendi."));
     }
 }
