@@ -13,7 +13,7 @@ public class AddressService : IAddressService
     private readonly IUnitOfWork _unitOfWork;
 
     public AddressService(
-        IRepository<Address> addressRepository, 
+        IRepository<Address> addressRepository,
         ICurrentUser currentUser,
         IUnitOfWork unitOfWork)
     {
@@ -26,7 +26,7 @@ public class AddressService : IAddressService
     {
         var userId = _currentUser.UserId;
         var addresses = await _addressRepository.FindAsync(a => a.UserId == userId);
-        
+
         return addresses.Select(a => new AddressDto(
             a.Id,
             a.Title,
@@ -38,17 +38,14 @@ public class AddressService : IAddressService
     public async Task<AddressDto> CreateAddressAsync(CreateAddressRequest request)
     {
         var userId = _currentUser.UserId;
-        
+
         var address = new Address
         {
-            Id = Guid.NewGuid(),
             UserId = userId,
             Title = request.Title,
             FullAddress = request.FullAddress,
             Latitude = request.Latitude,
-            Longitude = request.Longitude,
-            CreatedAtUtc = DateTime.UtcNow,
-            UpdatedAtUtc = DateTime.UtcNow
+            Longitude = request.Longitude
         };
 
         await _addressRepository.AddAsync(address);
@@ -66,7 +63,7 @@ public class AddressService : IAddressService
     {
         var userId = _currentUser.UserId;
         var address = await _addressRepository.GetByIdAsync(id);
-        
+
         if (address == null || address.UserId != userId)
             throw new DomainException("Address not found or access denied");
 
@@ -74,7 +71,6 @@ public class AddressService : IAddressService
         address.FullAddress = request.FullAddress;
         address.Latitude = request.Latitude;
         address.Longitude = request.Longitude;
-        address.UpdatedAtUtc = DateTime.UtcNow;
 
         _addressRepository.Update(address);
         await _unitOfWork.SaveChangesAsync();
@@ -91,7 +87,7 @@ public class AddressService : IAddressService
     {
         var userId = _currentUser.UserId;
         var address = await _addressRepository.GetByIdAsync(id);
-        
+
         if (address == null || address.UserId != userId)
             throw new DomainException("Address not found or access denied");
 

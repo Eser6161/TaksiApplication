@@ -11,15 +11,14 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.HasKey(u => u.Id);
 
         builder.Property(u => u.FullName)
-            .IsRequired()
             .HasMaxLength(150);
 
         builder.Property(u => u.Email)
-            .IsRequired()
             .HasMaxLength(256);
 
         builder.HasIndex(u => u.Email)
-            .IsUnique();
+            .IsUnique()
+            .HasFilter("[Email] IS NOT NULL");
 
         builder.Property(u => u.PhoneNumber)
             .HasMaxLength(20);

@@ -15,6 +15,7 @@ public static class AuthFeatureExtensions
         services.AddScoped<IOtpService, OtpService>();
         services.AddScoped<IJwtTokenService, JwtTokenService>();
         services.AddScoped<ICurrentUser, CurrentUser>();
+        services.AddScoped<IPasswordHasher, PasswordHasher>();
         
         return services;
     }
